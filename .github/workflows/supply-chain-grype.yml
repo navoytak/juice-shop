@@ -59,7 +59,9 @@ jobs:
       # 6. Install GuardDog via pip and jq to scan dependency risk
       - name: Install GuardDog & jq
         run: |
-          pip3 install guarddog
+          python3 -m venv .guarddog-venv
+          .guarddog-venv/bin/python -m pip install --upgrade pip
+          .guarddog-venv/bin/python -m pip install guarddog
           sudo apt-get install -y jq
         continue-on-error: true
 
@@ -79,7 +81,7 @@ jobs:
           for dep in $DEPS; do
             echo "----------------------------------------"
             echo "Scanning package: $dep"
-            guarddog npm scan "$dep" \
+            .guarddog-venv/bin/guarddog npm scan "$dep" \
               --exclude-rules metadata_mismatch \
               --exclude-rules potentially_compromised_email_domain \
               --exclude-rules unclaimed_maintainer_email_domain || true
